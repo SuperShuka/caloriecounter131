@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "377522398808",
+    "project_id": "caloriecounter131",
+    "storage_bucket": "caloriecounter131.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377522398808:android:58db629f7f5fe7302a4c2d",
+        "android_client_info": {
+          "package_name": "com.example.caloriecounter131"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377522398808-1qq4q5vg5k6hp7sng2srdh0qagdtmgk5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.caloriecounter131",
+            "certificate_hash": "c209ed44033c9f540ac81b8eb81a0cf023b77652"
+          }
+        },
+        {
+          "client_id": "377522398808-9ov7oq7mhvj0d68jvcurltj45u6qf1el.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAasfZ5vY85yN7FPw5YNzbvdQQp5fkkmBk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377522398808-9ov7oq7mhvj0d68jvcurltj45u6qf1el.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
