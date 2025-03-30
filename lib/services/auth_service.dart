@@ -29,6 +29,16 @@ class AuthService {
     }
   }
 
+  Future<bool> checkEmailExists(String email) async {
+    try {
+      final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      return methods.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
+
   Future<User?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -45,6 +55,10 @@ class AuthService {
     } catch (e) {
       throw e.toString();
     }
+  }
+
+  Future<void> resetPassword(String email) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
 
   Future<void> signOut() async {

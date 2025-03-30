@@ -78,7 +78,7 @@ class AuthWrapper extends StatelessWidget {
                             SizedBox(height: 20),
                             // Loading Text
                             Text(
-                              'Loading your fitness journey...',
+                              'Загружаем ваш путь к здоровью...',
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 color: Colors.black54,

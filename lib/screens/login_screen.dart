@@ -91,6 +91,80 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _handleForgotPassword() async {
+    // Validate the email first
+    final emailValue = _emailController.text.trim();
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
+    if (emailValue.isEmpty) {
+      setState(() {
+        _errorMessage = 'Пожалуйста, введите адрес электронной почты';
+      });
+      return;
+    }
+
+    if (!emailRegex.hasMatch(emailValue)) {
+      setState(() {
+        _errorMessage = 'Пожалуйста, введите корректный адрес электронной почты';
+      });
+      return;
+    }
+
+    // Show loading state
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    bool emailExists = await _authService.checkEmailExists(emailValue);
+
+    if (!emailExists) {
+      setState(() {
+        _errorMessage = 'Данная электронная почта не зарегистрирована';
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      await _authService.resetPassword(emailValue);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ссылка для восстановления пароля отправлена на $emailValue',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
+        ),
+      );
+    } catch (e) {
+      String errorMessage = e.toString();
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No user found with this email';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Invalid email address';
+            break;
+          default:
+            errorMessage = e.message ?? 'An error occurred';
+            break;
+        }
+      }
+
+      setState(() {
+        _errorMessage = errorMessage;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   void _handleAuthError(dynamic error) {
     String errorMessage = 'An unexpected error occurred';
 
@@ -120,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       errorMessage = error.toString();
       if (errorMessage == 'The supplied auth credential is incorrect, malformed or has expired.') {
-        errorMessage = 'Incorrect login or password';
+        errorMessage = 'Неверный логин или пароль';
       }
     }
 
@@ -142,12 +216,10 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 60),
+                  SizedBox(height: 90),
 
-                  // App Logo and Title
                   Column(
                     children: [
-
                       Container(
                         child: Center(
                           child: Text(
@@ -162,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'Track your calories with ease',
+                        'Правильное питание – в одно касание',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.brown[700],
@@ -205,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: 'Электронная почта',
                       labelStyle: GoogleFonts.poppins(
                         color: Colors.grey[700],
                       ),
@@ -231,10 +303,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
+                        return 'Пожалуйста, введите ваш адрес электронной почты';
                       }
                       if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                        return 'Enter a valid email address';
+                        return 'Пожалуйста, введите корректный адрес электронной почты';
                       }
                       return null;
                     },
@@ -246,7 +318,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: 'Пароль',
                       labelStyle: GoogleFonts.poppins(
                         color: Colors.grey[700],
                       ),
@@ -285,10 +357,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Пожалуйста, введите пароль';
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return 'Пароль должен быть не менее 6 символов';
                       }
                       return null;
                     },
@@ -299,11 +371,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {
-                        // TODO: Implement forgot password functionality
-                      },
+                      onPressed: _isLoading ? null : _handleForgotPassword,
                       child: Text(
-                        'Forgot Password?',
+                        'Забыли пароль?',
                         style: GoogleFonts.poppins(
                           color: Colors.black87,
                           fontWeight: FontWeight.w500,
@@ -337,7 +407,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     )
                         : Text(
-                      'Sign In',
+                      'Войти',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -358,7 +428,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     child: Text(
-                      'Sign Up',
+                      'Зарегистрироваться',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -374,7 +444,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'OR',
+                          'ИЛИ',
                           style: GoogleFonts.poppins(
                             color: Colors.grey.shade600,
                             fontWeight: FontWeight.w500,
@@ -394,7 +464,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 20,
                     ),
                     label: Text(
-                      'Continue with Google',
+                      'Продолжить с Google',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,

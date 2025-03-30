@@ -31,6 +31,7 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
 
   String? _gender;
   String? _workoutFrequency;
+  String? _primaryGoal;
   int _age = 20;
   double _height = 177;
   double _weight = 60;
@@ -181,11 +182,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
                   padding: const EdgeInsets.all(24.0),
                   child: ElevatedButton(
                     onPressed: _nextStep,
-                    child: Text(
-                      _currentStep == _totalSteps - 1 ? 'Finish' : 'Continue',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -194,6 +190,11 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
                         borderRadius: BorderRadius.circular(28),
                       ),
                       elevation: 2,
+                    ),
+                    child: Text(
+                      'Continue',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -362,6 +363,122 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
     );
   }
 
+  Widget _buildPrimaryGoalStep() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 40),
+          Text(
+            "Your fitness journey",
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: AppColors.text,
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            "What's your primary goal?",
+            style: TextStyle(
+              fontSize: 20,
+              color: AppColors.textLight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 40),
+          _buildGoalOption(
+              'Lose Weight', Icons.trending_down, '🔥', 'lose_weight'),
+          SizedBox(height: 20),
+          _buildGoalOption(
+              'Maintain Weight', Icons.balance, '⚖️', 'maintain_weight'),
+          SizedBox(height: 20),
+          _buildGoalOption(
+              'Gain Weight', Icons.trending_up, '💪', 'gain_weight'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalOption(String title, IconData icon, String emoji,
+      String value) {
+    final isSelected = _primaryGoal == value;
+
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isSelected ? AppColors.primary : Colors.grey.shade300,
+          width: isSelected ? 2 : 1,
+        ),
+        boxShadow: isSelected
+            ? [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.2),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          )
+        ]
+            : [],
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _primaryGoal = value;
+          });
+          HapticFeedback.lightImpact();
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: isSelected ? Colors.white : Colors.grey,
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight
+                          .w500,
+                      color: isSelected ? AppColors.primary : AppColors.text,
+                    ),
+                  ),
+                  // if (isSelected)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(top: 4.0),
+                  //   ),
+                ],
+              ),
+            ),
+            Text(
+              emoji,
+              style: TextStyle(fontSize: 24),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFrequencyOption(String title, String subtitle, IconData icon,
       String emoji, String value) {
     final isSelected = _workoutFrequency == value;
@@ -443,116 +560,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
       ),
     );
   }
-
-  // Widget _buildBirthYearStep() {
-  //
-  //   final int currentYear = DateTime
-  //       .now()
-  //       .year;
-  //
-  //   final List<int> years = List.generate(
-  //     67,
-  //         (index) => currentYear - 14 - index,
-  //   );
-  //
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 24.0),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         SizedBox(height: 40),
-  //         Text(
-  //           "About you",
-  //           style: TextStyle(
-  //             fontSize: 30,
-  //             fontWeight: FontWeight.bold,
-  //             color: AppColors.text,
-  //           ),
-  //         ),
-  //         SizedBox(height: 16),
-  //         Text(
-  //           "What is your birth year?",
-  //           style: TextStyle(
-  //             fontSize: 20,
-  //             color: AppColors.textLight,
-  //             fontWeight: FontWeight.w500,
-  //           ),
-  //         ),
-  //         SizedBox(height: 40),
-  //         Expanded(
-  //           child: Container(
-  //             decoration: BoxDecoration(
-  //               color: Colors.white,
-  //               borderRadius: BorderRadius.circular(16),
-  //               boxShadow: [
-  //                 BoxShadow(
-  //                   color: Colors.grey.withOpacity(0.1),
-  //                   blurRadius: 10,
-  //                   offset: Offset(0, 4),
-  //                 ),
-  //               ],
-  //             ),
-  //             child: Stack(
-  //               alignment: Alignment.center,
-  //               children: [
-  //
-  //                 Positioned(
-  //                   top: (MediaQuery
-  //                       .of(context)
-  //                       .size
-  //                       .height / 2) - 100,
-  //                   child: Container(
-  //                     height: 60,
-  //                     width: MediaQuery
-  //                         .of(context)
-  //                         .size
-  //                         .width - 48,
-  //                     decoration: BoxDecoration(
-  //                       color: AppColors.primary.withOpacity(0.1),
-  //                       borderRadius: BorderRadius.circular(8),
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 ListWheelScrollView.useDelegate(
-  //                   itemExtent: 60,
-  //                   perspective: 0.005,
-  //                   diameterRatio: 1.5,
-  //                   physics: FixedExtentScrollPhysics(),
-  //                   onSelectedItemChanged: (index) {
-  //                     setState(() {
-  //                       _age = years[index].toString();
-  //                     });
-  //                     HapticFeedback.selectionClick();
-  //                   },
-  //                   childDelegate: ListWheelChildBuilderDelegate(
-  //                     builder: (context, index) {
-  //                       final year = years[index];
-  //                       final isSelected = _age == year.toString();
-  //                       return Center(
-  //                         child: Text(
-  //                           year.toString(),
-  //                           style: TextStyle(
-  //                             fontSize: isSelected ? 24 : 20,
-  //                             fontWeight: isSelected
-  //                                 ? FontWeight.bold
-  //                                 : FontWeight.w500,
-  //                             color: isSelected ? AppColors.primary : AppColors
-  //                                 .textLight,
-  //                           ),
-  //                         ),
-  //                       );
-  //                     },
-  //                     childCount: years.length,
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildHeightStep() {
     final double minHeight = 140.0;
@@ -688,38 +695,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
                         ),
                       );
                     }),
-                    Positioned(
-                      bottom: personPosition.clamp(0.0, 180.0),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          Container(
-                            width: 12,
-                            height: 2,
-                            color: AppColors.primary,
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -765,44 +740,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
             ],
           ),
           const SizedBox(height: 40),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildAdjustButton(Icons.remove, () {
-                if (_height > minHeight) {
-                  setState(() {
-                    _height = _height - 1.0;
-                  });
-                  HapticFeedback.lightImpact();
-                }
-              }),
-              const SizedBox(width: 16),
-              Container(
-                width: 200,
-                height: 8,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blue.shade300,
-                      AppColors.primary,
-                      Colors.orange.shade300,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: 16),
-              _buildAdjustButton(Icons.add, () {
-                if (_height < maxHeight) {
-                  setState(() {
-                    _height = _height + 1.0;
-                  });
-                  HapticFeedback.lightImpact();
-                }
-              }),
-            ],
-          ),
-          const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Row(
@@ -829,33 +766,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
       ),
     );
   }
-
-  // Widget _buildAdjustButton(IconData icon, VoidCallback onPressed) {
-  //   return InkWell(
-  //     onTap: onPressed,
-  //     borderRadius: BorderRadius.circular(20),
-  //     child: Container(
-  //       width: 40,
-  //       height: 40,
-  //       decoration: BoxDecoration(
-  //         color: Colors.white,
-  //         borderRadius: BorderRadius.circular(20),
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: Colors.grey.shade300,
-  //             blurRadius: 8,
-  //             offset: const Offset(0, 2),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Icon(
-  //         icon,
-  //         color: AppColors.primary,
-  //         size: 24,
-  //       ),
-  //     ),
-  //   );
-  // }
 
   // Weight Selection Step
   Widget _buildWeightStep() {
@@ -947,47 +857,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
 
           const SizedBox(height: 60),
 
-          // Weight adjustment buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildAdjustButton(Icons.remove, () {
-                if (_weight > minWeight) {
-                  setState(() {
-                    _weight = _weight - 1.0;
-                  });
-                  HapticFeedback.lightImpact();
-                }
-              }),
-              const SizedBox(width: 16),
-              Container(
-                width: 200,
-                height: 8,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blue.shade300,
-                      AppColors.primary,
-                      Colors.orange.shade300,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              const SizedBox(width: 16),
-              _buildAdjustButton(Icons.add, () {
-                if (_weight < maxWeight) {
-                  setState(() {
-                    _weight = _weight + 1.0;
-                  });
-                  HapticFeedback.lightImpact();
-                }
-              }),
-            ],
-          ),
-
-          const SizedBox(height: 40),
-
           // Slider for weight selection
           SliderTheme(
             data: SliderThemeData(
@@ -1047,57 +916,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
           ),
 
           const SizedBox(height: 40),
-
-          // Unit selector
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 24),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      'KG',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    child: Text(
-                      'LB',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
           // Info card
           _buildWeightContext(),
         ],
@@ -1147,37 +965,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAdjustButton(IconData icon, VoidCallback onPressed) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            child: Icon(
-              icon,
-              size: 28,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -1549,48 +1336,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
           ),
 
           const SizedBox(height: 60),
-
-          // Age adjustment buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildAdjustButton(Icons.remove, () {
-                if (_age > minAge) {
-                  setState(() {
-                    _age--;
-                  });
-                  HapticFeedback.lightImpact();
-                }
-              }),
-              const SizedBox(width: 16),
-              Container(
-                width: 200,
-                height: 8,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blue.shade300,
-                      AppColors.primary,
-                      Colors.orange.shade300,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              const SizedBox(width: 16),
-              _buildAdjustButton(Icons.add, () {
-                if (_age < maxAge) {
-                  setState(() {
-                    _age++;
-                  });
-                  HapticFeedback.lightImpact();
-                }
-              }),
-            ],
-          ),
-
-          const SizedBox(height: 40),
-
           // Age slider
           SliderTheme(
             data: SliderThemeData(
@@ -1905,7 +1650,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
     });
 
     try {
-      print("saving try");
       User? currentUser = FirebaseAuth.instance.currentUser;
 
       if (currentUser == null) {
@@ -1922,8 +1666,6 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
         activityLevel: _workoutFrequency!,
       );
 
-      print("saving randomly");
-
       final macros = nutritionService.calculateMacroDistribution(
         calories: dailyCalories,
       );
@@ -1937,7 +1679,7 @@ class _ProfileSetupFlowState extends State<ProfileSetupFlow>
         height: _height,
         weight: _weight,
         targetWeight: _targetWeight,
-        primaryGoal: _targetWeight < _weight ? 'lose_weight' : 'gain_weight',
+        primaryGoal: _primaryGoal!,
         workoutFrequency: _workoutFrequency!,
         weeklyGoal: _weeklyGoal,
         dailyCalories: dailyCalories,
