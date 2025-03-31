@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:openfoodfacts/openfoodfacts.dart';
 
 import '../models/log_item.dart';
+import 'ErrorHandler.dart';
 import 'firestore_logs_service.dart';
 import 'nutrition_api_service.dart';
 
@@ -26,21 +27,21 @@ class LogsNotifier extends StateNotifier<List<LogItem>> {
       String foodDescription,
       ) async {
     try {
-      final logItems = await _nutritionService.getNutritionByDescription(foodDescription);
+      final logItems = await _nutritionService.getNutritionByDescription(context, foodDescription);
 
       if (logItems != []) {
         for (var logItem in logItems) {
           await _firebaseLogsService.addLogItem(logItem);
         }
       } else {
-        _showErrorDialog(context, 'Could not find nutrition information', 'Could not find nutrition information for "$foodDescription". Please try a more specific description like "chicken breast".');
+        ErrorHandler.showWarning(context, "Не удалось найти информацию о продукте.");
       }
     } catch (e) {
-      print("Error adding log item by description: $e");
+      ErrorHandler.showError(context, "Ошибка: $e");
     }
   }
 
-  Future<void> addLogItemByBarcode() async {
+  Future<void> addLogItemByBarcode(BuildContext context) async {
     try {
       OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'fitness_app');
 
@@ -54,16 +55,16 @@ class LogsNotifier extends StateNotifier<List<LogItem>> {
       );
 
       if (barcodeScanRes != '-1') {
-        final logItem = await _nutritionService.getNutritionByBarcode(barcodeScanRes);
+        final logItem = await _nutritionService.getNutritionByBarcode(context, barcodeScanRes);
 
         if (logItem != null) {
           await _firebaseLogsService.addLogItem(logItem);
         } else {
-          print('Could not find nutrition for this barcode');
+          ErrorHandler.showWarning(context, "Не удалось найти информацию о продукте.");
         }
       }
     } catch (e) {
-      print('Barcode scanning error: $e');
+      ErrorHandler.showError(context, "Ошибка: $e");
     }
   }
 
@@ -72,26 +73,17 @@ class LogsNotifier extends StateNotifier<List<LogItem>> {
       String workoutDescription,
       ) async {
     try {
-      final logItems = await _nutritionService.getWorkoutByDescription(workoutDescription);
+      final logItems = await _nutritionService.getWorkoutByDescription(context, workoutDescription);
 
       if (logItems.isNotEmpty) {
         for (var logItem in logItems) {
           await _firebaseLogsService.addLogItem(logItem);
         }
       } else {
-        _showErrorDialog(
-            context,
-            'Workout Not Found',
-            'Could not find workout information for "$workoutDescription". Please try a more specific description like "running 30 minutes" or "biking 5 miles".'
-        );
+        ErrorHandler.showWarning(context, "Не удалось найти информацию о тренировке.");
       }
     } catch (e) {
-      print("Error adding workout by description: $e");
-      _showErrorDialog(
-          context,
-          'Error',
-          'An unexpected error occurred while fetching workout data. Please try again later.'
-      );
+      ErrorHandler.showError(context, "Ошибка: $e");
     }
   }
 
@@ -128,84 +120,20 @@ class LogsNotifier extends StateNotifier<List<LogItem>> {
         );
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          addLogItemByDescription(context, data['outputs'][0]['data']['concepts'][0]['name']);
-          // for (var concept in data['outputs'][0]['data']['concepts']) {
-          //   if (concept['value'] > 0.80) {
-          //     addLogItemByDescription(context, concept['name']);
-          //   }
-          // }
+          // addLogItemByDescription(context, data['outputs'][0]['data']['concepts'][0]['name']);
+          for (var concept in data['outputs'][0]['data']['concepts']) {
+            if (concept['value'] > 0.90) {
+              addLogItemByDescription(context, concept['name']);
+            }
+          }
         }
         else{
-          print(response.body);
+          ErrorHandler.showError(context, "Не удалось найти информацию о продукте.");
         }
       }
     } catch (e) {
-      print("AI scan error: $e");
+      ErrorHandler.showError(context, "Ошибка: $e");
     }
-  }
-
-  void _showErrorDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        title: Row(
-          children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 28),
-            SizedBox(width: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              message,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(Icons.lightbulb_outline, color: Colors.amber, size: 20),
-                SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    "Tip: Try to be more specific with your description.",
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'OK',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-        backgroundColor: Colors.white,
-        elevation: 10,
-      ),
-    );
   }
 
   Future<void> syncLogsToFirebase() async {
@@ -228,7 +156,7 @@ class LogsNotifier extends StateNotifier<List<LogItem>> {
   }
 
   void addLogItem(LogItem logItem) {
-    state = [...state, logItem];
+    state = [logItem, ...state];
     syncLogsToFirebase();
   }
 }

@@ -87,7 +87,7 @@ class AddLogWidget extends ConsumerWidget {
                   label: 'Barcode',
                   onTap: () {
                     Navigator.pop(context);
-                    ref.read(logsProvider.notifier).addLogItemByBarcode();
+                    ref.read(logsProvider.notifier).addLogItemByBarcode(context);
                   },
                 ),
                 LogActionButton(

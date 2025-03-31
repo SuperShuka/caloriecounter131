@@ -1,3 +1,5 @@
+import 'package:caloriecounter131/services/ErrorHandler.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/openfoodfacts.dart';
@@ -24,7 +26,7 @@ class NutritionApiService {
     return result.text;
   }
 
-  Future<List<LogItem>> getNutritionByDescription(String foodDescription) async {
+  Future<List<LogItem>> getNutritionByDescription(BuildContext context, String foodDescription) async {
     try {
       final desc = await translateru(foodDescription);
       final response = await http.post(
@@ -39,7 +41,6 @@ class NutritionApiService {
         }),
       );
 
-      dPrint(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         List<LogItem> logItems = [];
@@ -72,13 +73,14 @@ class NutritionApiService {
 
         return logItems;
       }
+      ErrorHandler.showWarning(context, "Не удалось найти информацию о продукте.");
     } catch (e) {
-      dPrint('Nutrition API Error: $e');
+      ErrorHandler.showError(context, "Ошибка: $e");
     }
     return [];
   }
 
-  Future<List<LogItem>> getWorkoutByDescription(String workoutDescription) async {
+  Future<List<LogItem>> getWorkoutByDescription(BuildContext context, String workoutDescription) async {
     try {
       final desc = await translateru(workoutDescription);
       final response = await http.post(
@@ -115,17 +117,15 @@ class NutritionApiService {
         }
         return logItems;
       } else {
-        print('Workout API returned status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Workout API Error: $e');
+      ErrorHandler.showError(context, "Ошибка: $e");
       return [];
     }
   }
 
-  Future<LogItem?> getNutritionByBarcode(String barcode) async {
+  Future<LogItem?> getNutritionByBarcode(BuildContext context, String barcode) async {
     try {
 
       OpenFoodAPIConfiguration.userAgent = UserAgent(name: 'fitness_app');
@@ -162,7 +162,7 @@ class NutritionApiService {
         );
       }
     } catch (e) {
-      print('OpenFoodFacts Barcode Lookup Error: $e');
+      ErrorHandler.showError(context, "Ошибка: $e");
     }
     return null;
   }
