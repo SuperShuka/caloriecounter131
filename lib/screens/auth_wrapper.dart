@@ -1,4 +1,4 @@
-import 'package:caloriecounter131/screens/profile_setup_flow.dart';
+import 'package:caloriecounter131/screens/user_profile_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -96,7 +96,7 @@ class AuthWrapper extends StatelessWidget {
                 if (snapshot.data != null && snapshot.data!.exists) {
                   return MainScreen();
                 } else {
-                  return ProfileSetupFlow();
+                  return UserProfileSetup();
                 }
               },
             );
@@ -146,7 +146,7 @@ class AuthWrapper extends StatelessWidget {
                   SizedBox(height: 20),
                   // Loading Text
                   Text(
-                    'Loading your fitness journey...',
+                    'Загружаем ваш путь к здоровью...',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black54,

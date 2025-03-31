@@ -4,7 +4,7 @@ class MacroItem {
   final String name;
   final int left;
   final int total;
-  final IconData icon;
+  final String icon;
   final Color color;
 
   MacroItem({

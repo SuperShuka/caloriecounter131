@@ -28,20 +28,20 @@ class NutritionService {
         required int age,
         required double height,
         required double weight,
-        required String activityLevel,}) {
+        required String activityLevel,
+        required String goal}) {
 
     // Calculate BMR and TDEE
     double bmr = calculateBMR(gender, age, height, weight);
     double tdee = calculateTDEE(bmr, activityLevel);
 
-    String goal = "lose_weight";
     // Adjust calories based on goal
     switch (goal.toLowerCase()) {
-      case 'lose_weight':
+      case 'lose weight':
         return (tdee - 500).round(); // Create a 500 calorie deficit
-      case 'gain_weight':
+      case 'gain weight':
         return (tdee + 500).round(); // Create a 500 calorie surplus
-      case 'maintain_weight':
+      case 'maintain weight':
       default:
         return tdee.round(); // Maintain weight
     }

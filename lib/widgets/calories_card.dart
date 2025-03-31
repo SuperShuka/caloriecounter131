@@ -48,9 +48,12 @@ class CaloriesCard extends StatelessWidget {
               radius: 50,
               lineWidth: 10,
               percent: max(0,min(1, (caloriesTotal - caloriesLeft) / caloriesTotal)),
-              center: Icon(Icons.local_fire_department, color: Colors.orange),
-              progressColor: Colors.green,
-              backgroundColor: Colors.green.shade100,
+              center: Text(
+                '🔥',  // Fire emoji instead of icon
+                style: TextStyle(fontSize: 30), // Adjust size if needed
+              ),
+              progressColor: Colors.orange.shade400,
+              backgroundColor: Colors.orange.shade100,
             ),
           ],
         ),

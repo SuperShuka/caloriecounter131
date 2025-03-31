@@ -74,22 +74,22 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         name: "Protein",
         left: (userProfile?.proteinGoal ?? 100) - protein.round(),
         total: userProfile?.proteinGoal ?? 100,
-        icon: FontAwesomeIcons.drumstickBite,
-        color: Color(0xFF8D6E63),
+        icon: '🍗',
+        color: Colors.red,
       ),
       MacroItem(
         name: "Carbs",
         left: (userProfile?.carbsGoal ?? 300) - carbs.round(),
         total: userProfile?.carbsGoal ?? 300,
-        icon: FontAwesomeIcons.cookieBite,
-        color: Color(0xFF689F38),
+        icon: '🍞',
+        color: Colors.green,
       ),
       MacroItem(
         name: "Fat",
         left: (userProfile?.fatGoal ?? 50) - fat.round(),
         total: userProfile?.fatGoal ?? 50,
-        icon: FontAwesomeIcons.droplet,
-        color: Color(0xFFFFA000),
+        icon: '🧀',
+        color: Colors.amber,
       ),
     ];
   }

@@ -147,13 +147,13 @@ extension UserProfileCalculations on UserProfile {
       case 'light':
         return 1.375;
       case 'moderate':
-        return 1.55;
+        return 1.4;
       case 'very active':
-        return 1.725;
+        return 1.5;
       case 'extra active':
-        return 1.9;
+        return 1.6;
       default:
-        return 1.375; // Default to light activity if unrecognized.
+        return 1.375;
     }
   }
 
@@ -165,8 +165,6 @@ extension UserProfileCalculations on UserProfile {
   // Calculate calorie adjustment based on weekly weight goal
   int calculateDailyCalories() {
     double tdee = calculateTDEE();
-    // If a weekly goal is provided (non-zero), use that for more precise adjustment.
-    // The weeklyGoal is assumed to be in kg/week. Approximately 7700 calories correspond to 1kg.
     if (primaryGoal.toLowerCase().contains('lose')) {
       if (weeklyGoal < 0) {
         double calorieDeficit = (-weeklyGoal * 7700) / 7;

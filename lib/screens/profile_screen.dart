@@ -62,7 +62,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (profile != null) {
       setState(() {
         userProfile = profile;
-        // Set controller values
         _displayNameController.text = profile.displayName;
         _ageController.text = profile.age.toString();
         _heightController.text = profile.height.toString();
@@ -81,14 +80,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       try {
         final firestoreService = FirestoreService();
 
+        final _weight = double.parse(_weightController.text);
+        final _targetWeight = double.parse(_targetWeightController.text);
+        double _weeklyGoal = double.parse(_weeklyGoalController.text);
+
+        if (_weight < _targetWeight) {
+          _weeklyGoal = _weeklyGoal.abs();
+          _selectedGoal = 'gain weight';
+        }
+        else if (_weight > _targetWeight) {
+          _weeklyGoal = -_weeklyGoal.abs();
+          _selectedGoal = 'lose weight';
+        }
+        else {
+          _weeklyGoal = 0;
+          _selectedGoal = 'maintain weight';
+        }
+
         // Create updates map from form values
         final updates = {
           'displayName': _displayNameController.text,
           'age': int.parse(_ageController.text),
           'height': double.parse(_heightController.text),
-          'weight': double.parse(_weightController.text),
-          'targetWeight': double.parse(_targetWeightController.text),
-          'weeklyGoal': double.parse(_weeklyGoalController.text),
+          'weight': _weight,
+          'targetWeight': _targetWeight,
+          'weeklyGoal': _weeklyGoal,
           'gender': _selectedGender,
           'primaryGoal': _selectedGoal,
           'workoutFrequency': _selectedFrequency,
@@ -233,6 +249,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           mainAxisSpacing: 10,
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
+          childAspectRatio: 0.885,
           children: [
             _buildStatCard('Age', '${userProfile!.age}', Icons.calendar_today),
             _buildStatCard('Height', '${userProfile!.height.toInt()} cm', Icons.height),
@@ -266,15 +283,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           child: Column(
             children: [
-              _buildNutritionRow('Calories', '${userProfile!.dailyCalories} kcal', Icons.local_fire_department, Colors.red),
+              _buildNutritionRow('Calories', '${userProfile!.dailyCalories} kcal', '🔥', Colors.orange[400]!),
               Divider(),
-              _buildNutritionRow('Protein', '${userProfile!.proteinGoal} g', Icons.egg, Colors.brown[400]!),
+              _buildNutritionRow('Protein', '${userProfile!.proteinGoal} g', '🍗', Colors.red[400]!),
               Divider(),
-              _buildNutritionRow('Carbs', '${userProfile!.carbsGoal} g', Icons.bakery_dining, Colors.green[400]!),
+              _buildNutritionRow('Carbs', '${userProfile!.carbsGoal} g', '🍞', Colors.green[400]!),
               Divider(),
-              _buildNutritionRow('Fat', '${userProfile!.fatGoal} g', Icons.cake, Colors.orange[400]!),
-              Divider(),
-              _buildNutritionRow('Water', '${userProfile!.waterGoal} ml', Icons.water_drop, Colors.blue[400]!),
+              _buildNutritionRow('Fat', '${userProfile!.fatGoal} g', '🧀', Colors.amber[400]!),
             ],
           ),
         ),
@@ -367,7 +382,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildNutritionRow(String title, String value, IconData icon, Color color) {
+  Widget _buildNutritionRow(String title, String value, String icon, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -378,7 +393,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               color: color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: color),
+            child: Text(
+              icon,
+              style: TextStyle(fontSize: 18),
+            ),
           ),
           SizedBox(width: 16),
           Expanded(

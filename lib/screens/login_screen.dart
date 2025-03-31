@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../services/auth_service.dart';
 import 'auth_wrapper.dart';
-import 'profile_setup_flow.dart';
+import 'user_profile_setup.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

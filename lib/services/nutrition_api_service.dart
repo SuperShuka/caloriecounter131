@@ -4,15 +4,29 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'dart:convert';
 import '../models/log_item.dart';
 import '../utils/debug_print.dart';
+import 'package:translator/translator.dart';
 
 class NutritionApiService {
   static const String appId = 'abf1ae27';
   static const String apiKey = '2c8f12ecd62f5367303ecccd3df5e55f';
   static const String baseUrl = 'https://trackapi.nutritionix.com/v2/natural/nutrients';
   static const String workoutBaseUrl = 'https://trackapi.nutritionix.com/v2/natural/exercise';
+  final translator = GoogleTranslator();
+
+
+  Future<String> translateru(String input) async {
+    final result = await translator.translate(input, from: 'ru', to: 'en');
+    return result.text;
+  }
+
+  Future<String> translateen(String input) async {
+    final result = await translator.translate(input, from: 'en', to: 'ru');
+    return result.text;
+  }
 
   Future<List<LogItem>> getNutritionByDescription(String foodDescription) async {
     try {
+      final desc = await translateru(foodDescription);
       final response = await http.post(
         Uri.parse(baseUrl),
         headers: {
@@ -21,19 +35,20 @@ class NutritionApiService {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'query': foodDescription,
+          'query': desc,
         }),
       );
 
-
+      dPrint(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         List<LogItem> logItems = [];
         int duration_add = 0;
 
         for (var food in data['foods']) {
+          final nm = await translateen(food['food_name']);
           logItems.add(LogItem(
-            name: food['food_name'] ?? foodDescription,
+            name: nm ?? foodDescription,
             calories: food['nf_calories']?.toDouble() ?? 0.0,
             timestamp: DateTime.now().add(Duration(seconds: duration_add++)),
             type: LogItemType.meal,
@@ -58,13 +73,14 @@ class NutritionApiService {
         return logItems;
       }
     } catch (e) {
-      print('Nutrition API Error: $e');
+      dPrint('Nutrition API Error: $e');
     }
     return [];
   }
 
   Future<List<LogItem>> getWorkoutByDescription(String workoutDescription) async {
     try {
+      final desc = await translateru(workoutDescription);
       final response = await http.post(
         Uri.parse(workoutBaseUrl),
         headers: {
@@ -73,7 +89,7 @@ class NutritionApiService {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'query': workoutDescription,
+          'query': desc,
         }),
       );
 
@@ -89,8 +105,9 @@ class NutritionApiService {
         int duration_add = 0;
 
         for (var exercise in data['exercises']) {
+          final nm = await translateen(exercise['name']);
           logItems.add(LogItem(
-            name: exercise['name'] ?? workoutDescription,
+            name: nm ?? workoutDescription,
             calories: -exercise['nf_calories']?.toDouble() ?? 0.0,
             timestamp: DateTime.now().add(Duration(seconds: duration_add++)),
             type: LogItemType.training,

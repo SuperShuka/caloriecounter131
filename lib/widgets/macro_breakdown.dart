@@ -33,7 +33,10 @@ class MacroBreakdown extends StatelessWidget {
                       radius: 35,
                       lineWidth: 8,
                       percent: min(1 - (macro.left / macro.total), 1),
-                      center: Icon(macro.icon, color: macro.color, size: 20),
+                      center: Text(
+                        macro.icon, // Use emoji instead of icon
+                        style: TextStyle(fontSize: 20),
+                      ),
                       progressColor: macro.color,
                       backgroundColor: macro.color.withOpacity(0.2),
                     ),

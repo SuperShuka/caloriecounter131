@@ -151,7 +151,7 @@ class LogList extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    DateFormat('h:mm a').format(log.timestamp),
+                                    DateFormat('HH:mm').format(log.timestamp),
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                       fontSize: 12,
